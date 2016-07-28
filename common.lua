@@ -7,7 +7,7 @@ end
 
 local get_visited = function(pos)
   for i = 1, #dcircuits.visited do
-    if dcircuits.visited[i] == pos then
+    if vector.equals(dcircuits.visited[i], pos) then
       return true
     end
   end
@@ -32,9 +32,10 @@ dcircuits.follow = function(pos, facedir)
     local def = node.name:sub(defpos)
     local head = def:sub(11,14)
     if head == "con_" then
-      if dcircuits_cycle_checking and get_visited(pos) then
+      if dcircuits.config.cycle_checking and get_visited(pos) then
         return {error = "cycle", node = node, pos = pos, attribute = att}
       end
+      set_visited(pos)
       local newdir = node.param2
       local connection = tonumber(def:sub(15,15))
       if (connection > 0) and (((newdir + connection - 2) % 4) == facedir) then
@@ -43,16 +44,21 @@ dcircuits.follow = function(pos, facedir)
       else
         return {error = "wrong connected wires", node = node, pos = pos, attribute = att}
       end
-      set_visited(pos)
     elseif head == "att_" then
       if node.param2 == facedir then
         if att then
           return {error = "multiple attributes", node = node, pos = pos, attribute = att}
-        else
-          att = def:sub(15,17)
-          --facedir := facedir
-          pos = vector.add(pos, minetest.facedir_to_dir(facedir))
         end
+        if dcircuits.config.cycle_checking and get_visited(pos) then
+          return {error = "cycle", node = node, pos = pos, attribute = att}
+        end
+        set_visited(pos)
+        
+        att = def:sub(15,17)
+        --facedir := facedir
+        pos = vector.add(pos, minetest.facedir_to_dir(facedir))
+      else
+        return {error = "wrong connected attribute", node = node, pos = pos, attribute = att}
       end
     elseif head == "nod_" then
       return {node = node, pos = pos, attribute = att, dir = (facedir - node.param2 + 2) % 4}
@@ -151,7 +157,7 @@ dcircuits.use_connect = function(itemstack, user, pointed_thing)
     return itemstack
   end
   local node = minetest.get_node(pos)
-  if node.name:find("dcircuits_dis_") then
+  if node.name:find("dcircuits_dis_") or node.name:find("dcircuits_reg_") then
     dcircuits.connect(pos, node, user)
   end
   return itemstack
@@ -197,18 +203,41 @@ dcircuits.set_values = function(meta, values)
   meta:set_string("dc_v", minetest.serialize(values))
 end
 
-dcircuits.update = function(pos, node)
+dcircuits.update = function(pos, node, step)
   if not node.name:find("dcircuits_")  then
     minetest.chat_send_all("DCircuit: circuit broken!")
     return
   end
-  if (node.name:find("dcircuits_dis") or node.name:find("dcircuits_reg")) then
-    --TODO
+  if node.name:find("dcircuits_dis") then
     return
   end
+  if not step and node.name:find("dcircuits_reg") then
+    minetest.get_node_timer(pos):set(1,0)
+    return
+  end
+  
   local ddef = minetest.registered_nodes[node.name].dcircuits
   local meta = minetest.get_meta(pos)
   local inputs = dcircuits.get_values(meta)
+  
+  --initial values for e.g. integer input
+  for i = 1, 4 do 
+    local type = ddef.parents[i]
+    if type == "boolean" then
+      if inputs[i] ~= true then
+        inputs[i] = false
+      end
+    elseif type == "integer" then
+      if not tonumber(inputs[i]) then
+        inputs[i] = 0
+      end
+    elseif type == "string" then
+      if not tostring(inputs[i]) then
+        inputs[i] = ""
+      end
+    end
+  end
+  
   local outputs = ddef.eval(inputs, pos, node)
   local updates = {}
   for i = 1, 4 do

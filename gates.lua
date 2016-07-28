@@ -20,6 +20,7 @@ dcircuits.register_gate = function(name, def)
   })
   minetest.register_node("dcircuits:dcircuits_dis_gat_"..name, {
     description = def.description,
+    inventory_image = def.texture,
     tiles = {def.texture.."^dcircuits_disabled.png"},
     drawtype = "nodebox",
     node_box = {
@@ -67,6 +68,54 @@ dcircuits.register_gate("xor", {
     children = {nil, nil, "boolean", nil},
     eval = function(inputs, pos, node)
       return {nil, nil, inputs[2] ~= inputs[4]}
+    end,
+  },
+})
+
+dcircuits.register_gate("cond_bool", {
+  description = "Multiplexer",
+  texture = "dcircuits_cond_bool.png",
+  dcircuits = {
+    parents = {"boolean", "boolean", nil, "boolean"},
+    children = {nil, nil, "boolean", nil},
+    eval = function(inputs, pos, node)
+      if inputs[1] then
+        return {nil, nil, inputs[4]}
+      else
+        return {nil, nil, inputs[2]}
+      end
+    end,
+  },
+})
+
+dcircuits.register_gate("cond_int", {
+  description = "Multiplexer",
+  texture = "dcircuits_cond_int.png",
+  dcircuits = {
+    parents = {"boolean", "integer", nil, "integer"},
+    children = {nil, nil, "integer", nil},
+    eval = function(inputs, pos, node)
+      if inputs[1] then
+        return {nil, nil, inputs[4]}
+      else
+        return {nil, nil, inputs[2]}
+      end
+    end,
+  },
+})
+
+dcircuits.register_gate("cond_str", {
+  description = "Multiplexer",
+  texture = "dcircuits_cond_str.png",
+  dcircuits = {
+    parents = {"boolean", "string", nil, "string"},
+    children = {nil, nil, "string", nil},
+    eval = function(inputs, pos, node)
+      if inputs[1] then
+        return {nil, nil, inputs[4]}
+      else
+        return {nil, nil, inputs[2]}
+      end
     end,
   },
 })
@@ -163,6 +212,31 @@ dcircuits.register_gate("concat", {
     children = {nil, nil, "string", nil},
     eval = function(inputs, pos, node)
       return {nil, nil, inputs[2]..inputs[4]}
+    end,
+  },
+})
+
+dcircuits.register_gate("select", {
+  description = "Select",
+  texture = "dcircuits_select.png",
+  dcircuits = {
+    parents = {nil, "integer", nil, "string"},
+    children = {nil, nil, "string", nil},
+    eval = function(inputs, pos, node)
+      local p = inputs[2]
+      return {nil, nil, inputs[4]:sub(p, p)}
+    end,
+  },
+})
+
+dcircuits.register_gate("str_eq", {
+  description = "Equals",
+  texture = "dcircuits_str_eq.png",
+  dcircuits = {
+    parents = {nil, "string", nil, "string"},
+    children = {nil, nil, "boolean", nil},
+    eval = function(inputs, pos, node)
+      return {nil, nil, inputs[2] == inputs[4]}
     end,
   },
 })
