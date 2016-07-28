@@ -151,7 +151,7 @@ dcircuits.register_gate("less", {
     parents = {nil, "integer", nil, "integer"},
     children = {nil, nil, "boolean", nil},
     eval = function(inputs, pos, node)
-      return {nil, nil, inputs[2] < inputs[4]}
+      return {nil, nil, inputs[4] < inputs[2]}
     end,
   },
 })

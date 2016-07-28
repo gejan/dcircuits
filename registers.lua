@@ -16,20 +16,20 @@ minetest.register_node("dcircuits:dcircuits_reg_bool",{
   dcircuits = {
     parents = {"boolean", nil,       nil, "boolean" },
     children = {     nil, nil, "boolean", },
+    disabeld = "dcircuits:dcircuits_reg_bool",
     eval = function(inputs, pos, node)
         return {nil, nil, inputs[1]}
     end
   },
   after_dig_node = dcircuits.after_dig_node,
   on_timer = function(pos)
-    dcircuits.update(pos, minetest.get_node(pos), true)
+      dcircuits.update(pos, minetest.get_node(pos))
   end
 })
 
---[[
-minetest.register_node("dcircuits:dcircuits_dis_reg_bool",{
+minetest.register_node("dcircuits:dcircuits_reg_int",{
   description = "Register",
-  tiles = {"dcircuits_reg_bool.png^dcircuits_disabled.png"},
+  tiles = {"dcircuits_reg_int.png"},
   drawtype = "nodebox",
   node_box = {
     type = "fixed",
@@ -41,8 +41,15 @@ minetest.register_node("dcircuits:dcircuits_dis_reg_bool",{
   groups = {snappy = 1, oddly_breakable_by_hand = 1},
   
   dcircuits = {
-    parents = {"boolean", nil,       nil, "boolean" },
-    children = {     nil, nil, "boolean", },
+    parents = {"integer", nil,       nil, "boolean" },
+    children = {     nil, nil, "integer", },
+    disabeld = "dcircuits:dcircuits_reg_int",
+    eval = function(inputs, pos, node)
+        return {nil, nil, inputs[1]}
+    end
   },
   after_dig_node = dcircuits.after_dig_node,
-}) ]]
+  on_timer = function(pos)
+    dcircuits.update(pos, minetest.get_node(pos))
+  end
+})

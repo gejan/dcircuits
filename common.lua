@@ -21,6 +21,7 @@ end
 
 dcircuits.follow = function(pos, facedir)
  local att = nil
+ local imm = true
  local pos = vector.add(pos, minetest.facedir_to_dir(facedir))
  begin_visit()
  while true do
@@ -36,6 +37,7 @@ dcircuits.follow = function(pos, facedir)
         return {error = "cycle", node = node, pos = pos, attribute = att}
       end
       set_visited(pos)
+      imm = false
       local newdir = node.param2
       local connection = tonumber(def:sub(15,15))
       if (connection > 0) and (((newdir + connection - 2) % 4) == facedir) then
@@ -53,6 +55,7 @@ dcircuits.follow = function(pos, facedir)
           return {error = "cycle", node = node, pos = pos, attribute = att}
         end
         set_visited(pos)
+        imm = false
         
         att = def:sub(15,17)
         --facedir := facedir
@@ -61,13 +64,13 @@ dcircuits.follow = function(pos, facedir)
         return {error = "wrong connected attribute", node = node, pos = pos, attribute = att}
       end
     elseif head == "nod_" then
-      return {node = node, pos = pos, attribute = att, dir = (facedir - node.param2 + 2) % 4}
+      return {node = node, pos = pos, attribute = att, dir = (facedir - node.param2 + 2) % 4, imm = imm}
     elseif head == "src_" then
-      return {node = node, pos = pos, attribute = att, dir = (facedir - node.param2 + 2) % 4}
+      return {node = node, pos = pos, attribute = att, dir = (facedir - node.param2 + 2) % 4, imm = imm}
     elseif head == "gat_" then
-      return {node = node, pos = pos, attribute = att, dir = (facedir - node.param2 + 2) % 4}
+      return {node = node, pos = pos, attribute = att, dir = (facedir - node.param2 + 2) % 4, imm = imm}
     elseif head == "reg_" then
-      return {node = node, pos = pos, attribute = att, dir = (facedir - node.param2 + 2) % 4}
+      return {node = node, pos = pos, attribute = att, dir = (facedir - node.param2 + 2) % 4, imm = imm}
     elseif head == "dis_" then
       return {error = "predecessor not enabled", node = node, pos = pos, attribute = att}
     elseif head == "trg_" then
@@ -96,13 +99,40 @@ dcircuits.add_child = function(pos, dir, target_pos, target_dir, att)
 end
 
 
-local attribute_match = function(type, att)
-  if     type == "boolean" then return (att == nil) or (att == "not") 
-  elseif type == "integer" then return att == "num" 
-  elseif type == "string"  then return att == "str"
-  else                          return false 
+local attribute_match 
+
+if dcircuits.config.type_attribute_mode == "no_check" then
+  attribute_match = function(type, att, imm)
+    return true
+  end
+elseif dcircuits.config.type_attribute_mode == "check" then
+  attribute_match = function(type, att, imm)
+    if     type == "boolean" then return (att == nil) or (att == "not") 
+    elseif type == "integer" then return (att == nil) or (att == "num") 
+    elseif type == "string"  then return (att == nil) or (att == "str")
+    else                          return false 
+    end
+  end
+elseif dcircuits.config.type_attribute_mode == "direct" then
+  attribute_match = function(type, att, imm)
+    if imm then return true
+    elseif type == "boolean" then return (att == nil) or (att == "not") 
+    elseif type == "integer" then return att == "num" 
+    elseif type == "string"  then return att == "str"
+    else                          return false 
+    end
+  end
+elseif dcircuits.config.type_attribute_mode == "strong" then
+  attribute_match = function(type, att, imm)
+    if     type == "boolean" then return (att == nil) or (att == "not") 
+    elseif type == "integer" then return att == "num" 
+    elseif type == "string"  then return att == "str"
+    else                          return false 
+    end
   end
 end
+
+
 
 
 dcircuits.connect = function(pos, node, player)
@@ -119,7 +149,7 @@ dcircuits.connect = function(pos, node, player)
       end
       local parent_def = minetest.registered_nodes[parent.node.name].dcircuits
       if  ddef.parents[i] == parent_def.children[parent.dir + 1] then
-        if attribute_match(ddef.parents[i], parent.attribute) then
+        if attribute_match(ddef.parents[i], parent.attribute, parent.imm) then
           dcircuits.add_parent(pos, dir, parent.pos, parent.dir)
           table.insert(parent_list, parent)
           if parent.attribute == "not" then
@@ -203,7 +233,7 @@ dcircuits.set_values = function(meta, values)
   meta:set_string("dc_v", minetest.serialize(values))
 end
 
-dcircuits.update = function(pos, node, step)
+dcircuits.update = function(pos, node)
   if not node.name:find("dcircuits_")  then
     minetest.chat_send_all("DCircuit: circuit broken!")
     return
@@ -211,10 +241,10 @@ dcircuits.update = function(pos, node, step)
   if node.name:find("dcircuits_dis") then
     return
   end
-  if not step and node.name:find("dcircuits_reg") then
-    minetest.get_node_timer(pos):set(1,0)
-    return
-  end
+  --if not step and node.name:find("dcircuits_reg") then
+  --   minetest.get_node_timer(pos):set(1,0)
+  --  return
+  --end
   
   local ddef = minetest.registered_nodes[node.name].dcircuits
   local meta = minetest.get_meta(pos)
@@ -249,10 +279,18 @@ dcircuits.update = function(pos, node, step)
         if meta:get_string("dc_c_"..(i - 1).."_att") == "not" then
           outputs[i] = not outputs[i]
         end    
-        if values[meta:get_int(("dc_c_"..(i - 1).."_dir")) + 1] ~= outputs[i] then
-          values[meta:get_int(("dc_c_"..(i - 1).."_dir")) + 1] = outputs[i] 
+        local child_dir = meta:get_int(("dc_c_"..(i - 1).."_dir")) + 1
+        if values[child_dir] ~= outputs[i] then
+          values[child_dir] = outputs[i] 
           dcircuits.set_values(child_meta, values)
-          updates[i]=child_pos
+          local child_node = minetest.get_node(child_pos)
+          if child_node.name:find("dcircuits_reg_") then
+            if child_dir == 4 and values[child_dir] then
+              minetest.get_node_timer(child_pos):set(1,0)
+            end
+          else
+            updates[i] = child_pos
+          end
         end  
       end
     end

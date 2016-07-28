@@ -4,8 +4,11 @@ dcircuits.config = {}
 dcircuits.config.cycle_checking = false               -- not really impl
 dcircuits.config.replace_connections = false          -- not impl
 dcircuits.config.disable_on_dig_connection = true
-dcircuits.config.type_attribute_mode = "strong"                   -- not impl    "no_check", "check", "direct", "strong"
-dcircuits.config.require_type_attribute = {"integer", "string"}   -- not impl
+
+
+
+
+dcircuits.config.type_attribute_mode = "direct"                   -- not impl    "no_check", "check", "direct", "strong"
 
 local path = minetest.get_modpath("dcircuits")
 dofile(path.."/common.lua")
