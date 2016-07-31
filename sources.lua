@@ -24,6 +24,7 @@ minetest.register_node("dcircuits:lever_dcircuits_src_on", {
     dcircuits.update(pos, node)
   end,
   after_dig_node = dcircuits.after_dig_node,
+  drop = "dcircuits:lever_dcircuits_src_off",
 })
 
 minetest.register_node("dcircuits:lever_dcircuits_src_off", {
@@ -77,6 +78,7 @@ minetest.register_node("dcircuits:one_way_dcircuits_src_true", {
   after_dig_node = dcircuits.after_dig_node,
 })
 
+--[[ Value <- Itemstack:count
 minetest.register_node("dcircuits:constant_dcircuits_src_int", {
   description = "Integer Constant",
   tiles = {"dcircuits_constant.png"},
@@ -104,7 +106,7 @@ minetest.register_node("dcircuits:constant_dcircuits_src_int", {
     return itemstack
   end,
   after_dig_node = dcircuits.after_dig_node,
-})
+}) ]]
 
 
 

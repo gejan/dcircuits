@@ -2,6 +2,7 @@
 
 minetest.register_node("dcircuits:dcircuits_reg_bool",{
   description = "Register",
+  inventory_image = "dcircuits_reg_bool.png",
   tiles = {"dcircuits_reg_bool.png"},
   drawtype = "nodebox",
   node_box = {
@@ -29,6 +30,7 @@ minetest.register_node("dcircuits:dcircuits_reg_bool",{
 
 minetest.register_node("dcircuits:dcircuits_reg_int",{
   description = "Register",
+  inventory_image = "dcircuits_reg_int.png",
   tiles = {"dcircuits_reg_int.png"},
   drawtype = "nodebox",
   node_box = {
@@ -44,6 +46,34 @@ minetest.register_node("dcircuits:dcircuits_reg_int",{
     parents = {"integer", nil,       nil, "boolean" },
     children = {     nil, nil, "integer", },
     disabeld = "dcircuits:dcircuits_reg_int",
+    eval = function(inputs, pos, node)
+        return {nil, nil, inputs[1]}
+    end
+  },
+  after_dig_node = dcircuits.after_dig_node,
+  on_timer = function(pos)
+    dcircuits.update(pos, minetest.get_node(pos))
+  end
+})
+
+minetest.register_node("dcircuits:dcircuits_reg_str",{
+  description = "Register",
+  inventory_image = "dcircuits_reg_str.png",
+  tiles = {"dcircuits_reg_str.png"},
+  drawtype = "nodebox",
+  node_box = {
+    type = "fixed",
+    fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
+  },
+  paramtype = "light",
+  paramtype2 = "facedir",
+  walkable = true,
+  groups = {snappy = 1, oddly_breakable_by_hand = 1},
+  
+  dcircuits = {
+    parents = {"string", nil,       nil, "boolean" },
+    children = {     nil, nil, "string", },
+    disabeld = "dcircuits:dcircuits_reg_str",
     eval = function(inputs, pos, node)
         return {nil, nil, inputs[1]}
     end

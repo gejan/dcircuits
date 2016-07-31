@@ -59,6 +59,7 @@ minetest.register_node("dcircuits:dcircuits_trg_to_mese_off",{
 
 minetest.register_node("dcircuits:dcircuits_dis_trg_to_mese_off",{
   description = "Converter",
+  inventory_image = "dcircuits_to_mese_off.png",
   tiles = {"dcircuits_to_mese_off.png^dcircuits_disabled.png"},
   drawtype = "nodebox",
   node_box = {
@@ -111,6 +112,7 @@ minetest.register_node("dcircuits:dcircuits_src_mese_to_on",{
 
 minetest.register_node("dcircuits:dcircuits_src_mese_to_off",{
   description = "Converter",
+  inventory_image = "dcircuits_mese_to_off.png",
   tiles = {"dcircuits_mese_to_off.png"},
   drawtype = "nodebox",
   node_box = {
@@ -136,3 +138,31 @@ minetest.register_node("dcircuits:dcircuits_src_mese_to_off",{
     end,
   },
 })
+
+
+-- crafting
+--///////////////////////
+
+minetest.register_craft({
+  output = "dcircuits:dcircuits_dis_trg_to_mese_off",
+  recipe = {
+    {"", "", ""},
+    {"dcircuits:dcircuits_con_0", "", ""},
+    {"mesecons:wire_00000000_off", "", ""}
+  }
+})
+
+minetest.register_craft({
+  output = "dcircuits:dcircuits_src_mese_to_off",
+  recipe = {
+    {"mesecons:wire_00000000_off", "", ""},
+    {"dcircuits:dcircuits_con_0", "", ""},
+    {"", "", ""}
+  }
+})
+
+
+
+
+
+

@@ -10,7 +10,7 @@ minetest.register_node("dcircuits:dcircuits_trg_lamp_on", {
   paramtype2 = "facedir",
   
   walkable = true,
-  groups = {snappy = 1, oddly_breakable_by_hand = 1},
+  groups = {not_in_creative_inventory = 1, snappy = 1, oddly_breakable_by_hand = 1},
   light_source = 13,
   
   dcircuits = {
@@ -26,6 +26,7 @@ minetest.register_node("dcircuits:dcircuits_trg_lamp_on", {
     end,
     },
     after_dig_node = dcircuits.after_dig_node,
+    drop = "dcircuits:dcircuits_dis_trg_lamp_off",
 })
 
 minetest.register_node("dcircuits:dcircuits_trg_lamp_off", {
@@ -39,7 +40,7 @@ minetest.register_node("dcircuits:dcircuits_trg_lamp_off", {
   paramtype = "light",
   paramtype2 = "facedir",
   walkable = true,
-  groups = {snappy = 1, oddly_breakable_by_hand = 1},
+  groups = {not_in_creative_inventory = 1, snappy = 1, oddly_breakable_by_hand = 1},
   
   dcircuits = {
     parents = {"boolean"},
@@ -53,10 +54,12 @@ minetest.register_node("dcircuits:dcircuits_trg_lamp_off", {
     end
   },
   after_dig_node = dcircuits.after_dig_node,
+  drop = "dcircuits:dcircuits_dis_trg_lamp_off",
 })
 
 minetest.register_node("dcircuits:dcircuits_dis_trg_lamp_off", {
   description = "Lamp",
+  inventory_image = "dcircuits_lamp_off.png",
   tiles = {"dcircuits_lamp_off.png^dcircuits_disabled.png"},
   drawtype = "nodebox",
   node_box = {
@@ -69,7 +72,7 @@ minetest.register_node("dcircuits:dcircuits_dis_trg_lamp_off", {
   groups = {snappy = 1, oddly_breakable_by_hand = 1},
   
   dcircuits = {
-    parents = {"boolean",nil,nil,nil},
+    parents = {"boolean",},
     children = {},
   },
 })
@@ -81,16 +84,18 @@ minetest.register_node("dcircuits:dcircuits_dis_trg_lamp_off", {
 
 minetest.register_node("dcircuits:dcircuits_trg_sign_int", {
   description = "Integer Sign",
-  tiles = {"dcircuits_lamp_off.png"},
+  tiles = { "dcircuits_sign.png", "dcircuits_sign.png", 
+            "dcircuits_sign.png", "dcircuits_sign.png", 
+            "dcircuits_sign_back_int.png", "dcircuits_sign.png"},
   drawtype = "nodebox",
   node_box = {
     type = "fixed",
-    fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
+    fixed = {{-0.5, -0.5, 0.5, 0.5, 0.5, 0.375}}
   },
   paramtype = "light",
   paramtype2 = "facedir",
   walkable = true,
-  groups = {snappy = 1, oddly_breakable_by_hand = 1},
+  groups = {not_in_creative_inventory = 1, snappy = 1, oddly_breakable_by_hand = 1},
   
   dcircuits = {
     parents = {"integer"},
@@ -102,15 +107,19 @@ minetest.register_node("dcircuits:dcircuits_trg_sign_int", {
     end
   },
   after_dig_node = dcircuits.after_dig_node,
+  drop = "dcircuits:dcircuits_dis_trg_sign_int",
 })
 
 minetest.register_node("dcircuits:dcircuits_dis_trg_sign_int", {
   description = "Integer Sign",
-  tiles = {"dcircuits_lamp_off.png^dcircuits_disabled.png"},
+  inventory_image = "dcircuits_sign.png^dcircuits_n.png",
+  tiles = { "dcircuits_sign.png", "dcircuits_sign.png", 
+            "dcircuits_sign.png", "dcircuits_sign.png", 
+            "dcircuits_sign_back_int.png", "dcircuits_sign.png^dcircuits_disabled.png"},
   drawtype = "nodebox",
   node_box = {
     type = "fixed",
-    fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
+    fixed = {{-0.5, -0.5, 0.5, 0.5, 0.5, 0.375}}
   },
   paramtype = "light",
   paramtype2 = "facedir",
@@ -118,7 +127,57 @@ minetest.register_node("dcircuits:dcircuits_dis_trg_sign_int", {
   groups = {snappy = 1, oddly_breakable_by_hand = 1},
   
   dcircuits = {
-    parents = {"integer",nil,nil,nil},
+    parents = {"integer",},
+    children = {},
+  },
+})
+
+minetest.register_node("dcircuits:dcircuits_trg_sign_str", {
+  description = "Sign",
+  tiles = { "dcircuits_sign.png", "dcircuits_sign.png", 
+            "dcircuits_sign.png", "dcircuits_sign.png", 
+            "dcircuits_sign_back_str.png", "dcircuits_sign.png"},
+  drawtype = "nodebox",
+  node_box = {
+    type = "fixed",
+    fixed = {{-0.5, -0.5, 0.5, 0.5, 0.5, 0.375}}
+  },
+  paramtype = "light",
+  paramtype2 = "facedir",
+  walkable = true,
+  groups = {not_in_creative_inventory = 1, snappy = 1, oddly_breakable_by_hand = 1},
+  
+  dcircuits = {
+    parents = {"string"},
+    children = {},
+    eval = function(inputs, pos, node)
+      local meta = minetest.get_meta(pos)
+      meta:set_string("infotext", tostring(inputs[1]))
+      return {}
+    end
+  },
+  after_dig_node = dcircuits.after_dig_node,
+  drop = "dcircuits:dcircuits_dis_trg_sign_str",
+})
+
+minetest.register_node("dcircuits:dcircuits_dis_trg_sign_str", {
+  description = "Sign",
+  inventory_image = "dcircuits_sign.png^dcircuits_s.png",
+  tiles = { "dcircuits_sign.png", "dcircuits_sign.png", 
+            "dcircuits_sign.png", "dcircuits_sign.png", 
+            "dcircuits_sign_back_str.png", "dcircuits_sign.png^dcircuits_disabled.png"},
+  drawtype = "nodebox",
+  node_box = {
+    type = "fixed",
+    fixed = {{-0.5, -0.5, 0.5, 0.5, 0.5, 0.375}}
+  },
+  paramtype = "light",
+  paramtype2 = "facedir",
+  walkable = true,
+  groups = {snappy = 1, oddly_breakable_by_hand = 1},
+  
+  dcircuits = {
+    parents = {"string",},
     children = {},
   },
 })

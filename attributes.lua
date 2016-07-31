@@ -1,5 +1,6 @@
 minetest.register_node("dcircuits:dcircuits_att_not", {
   description = "Attribute Not",
+  inventory_image = "dcircuits_not.png",
   tiles = {"dcircuits_not.png"},
   drawtype = "nodebox",
   node_box = {
@@ -15,6 +16,7 @@ minetest.register_node("dcircuits:dcircuits_att_not", {
 
 minetest.register_node("dcircuits:dcircuits_att_num", {
   description = "Attribute Number",
+  inventory_image = "dcircuits_num.png",
   tiles = {"dcircuits_num.png"},
   drawtype = "nodebox",
   node_box = {
@@ -30,6 +32,7 @@ minetest.register_node("dcircuits:dcircuits_att_num", {
 
 minetest.register_node("dcircuits:dcircuits_att_str", {
   description = "Attribute String",
+  inventory_image = "dcircuits_str.png",
   tiles = {"dcircuits_str.png"},
   drawtype = "nodebox",
   node_box = {

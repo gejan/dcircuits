@@ -46,6 +46,62 @@ dcircuits.follow = function(pos, facedir)
       else
         return {error = "wrong connected wires", node = node, pos = pos, attribute = att}
       end
+    elseif head == "conI" then  
+      if dcircuits.config.cycle_checking and get_visited(pos) then
+        return {error = "cycle", node = node, pos = pos, attribute = att}
+      end
+      set_visited(pos)
+      imm = false
+      local con_def = def:sub(15, 20)
+      if con_def == "cross_" then
+        if node.param2 == facedir or (node.param2 + 3) % 4 == facedir then
+          pos = vector.add(pos, minetest.facedir_to_dir(facedir))
+        else
+          return {error = "wrong connected wires", node = node, pos = pos, attribute = att}
+        end
+      elseif con_def == "arw_d_" then
+        if facedir == 4 then
+          pos = vector.add(pos, {x=0, y=1, z=0})
+        else
+          return {error = "wrong connected wires", node = node, pos = pos, attribute = att}
+        end
+      elseif con_def == "arw_u_" then
+        if facedir == 5 then
+          pos = vector.add(pos, {x=0, y=-1, z=0})
+        else
+          return {error = "wrong connected wires", node = node, pos = pos, attribute = att}
+        end
+      elseif con_def == "bot_i_" then
+        if facedir == 5 then
+          facedir = (node.param2 + 2) % 4
+          pos = vector.add(pos, minetest.facedir_to_dir(facedir))
+        else
+          return {error = "wrong connected wires", node = node, pos = pos, attribute = att}
+        end
+      elseif con_def == "top_i_" then
+        if facedir == 4 then
+          facedir = node.param2
+          pos = vector.add(pos, minetest.facedir_to_dir(facedir))
+        else
+          return {error = "wrong connected wires", node = node, pos = pos, attribute = att}
+        end
+      elseif con_def == "bot_o_" then
+        if facedir == node.param2 then
+          facedir = 4
+          pos = vector.add(pos, {x=0, y=1, z=0})
+        else
+          return {error = "wrong connected wires", node = node, pos = pos, attribute = att}
+        end
+      elseif con_def == "top_o_" then
+        if facedir == node.param2 then
+          facedir = 5
+          pos = vector.add(pos, {x=0, y=-1, z=0})
+        else
+          return {error = "wrong connected wires", node = node, pos = pos, attribute = att}
+        end
+      else
+        return {error = "unknown wire", node = node, pos = pos, attribute = att}
+      end
     elseif head == "att_" then
       if node.param2 == facedir then
         if att then
@@ -96,6 +152,12 @@ dcircuits.add_child = function(pos, dir, target_pos, target_dir, att)
   if att then
     meta:set_string("dc_c_"..dir.."_att", att)
   end
+end
+
+dcircuits.remove_child = function(meta, dir)
+  meta:set_string("dc_c_"..dir.."_pos", nil)
+  meta:set_string("dc_c_"..dir.."_dir", nil)
+  meta:set_string("dc_c_"..dir.."_att", nil)
 end
 
 
@@ -176,49 +238,6 @@ dcircuits.connect = function(pos, node, player)
   end
 end
 
-------------------------------------------------------
-
-dcircuits.use_connect = function(itemstack, user, pointed_thing)
-  if pointed_thing.type ~= "node" then
-    return itemstack
-  end
-  local pos = pointed_thing.under
-  if minetest.is_protected(pos, user) then
-    return itemstack
-  end
-  local node = minetest.get_node(pos)
-  if node.name:find("dcircuits_dis_") or node.name:find("dcircuits_reg_") then
-    dcircuits.connect(pos, node, user)
-  end
-  return itemstack
-end
-
-minetest.register_craftitem("dcircuits:stick_stick",{
-  description = "Stick Stick",
-  inventory_image = "dcircuits_stick_stick.png",
-  stack_max = 1,
-  on_use = dcircuits.use_connect,
-})
-
-minetest.register_craftitem("dcircuits:meta_stick",{
-  description = "Meta Stick",
-  inventory_image = "dcircuits_stick_stick.png",
-  stack_max = 1,
-  on_use = function(itemstack, user, pointed_thing)
-    if pointed_thing.type ~= "node" then
-      return itemstack
-    end
-    local meta = minetest.get_meta(pointed_thing.under)
-    minetest.chat_send_player(user:get_player_name(), "META:"..minetest.serialize(meta:to_table()))
-    local node = minetest.get_node(pointed_thing.under)
-    minetest.chat_send_player(user:get_player_name(), "PARAM1:"..node.param1)
-    minetest.chat_send_player(user:get_player_name(), "PARAM2:"..node.param2)
-    return itemstack
-  end,
-})
-
------------------------------------------------------------
-
 
 dcircuits.get_values = function(meta)
   local s = minetest.deserialize(meta:get_string("dc_v"))
@@ -235,7 +254,7 @@ end
 
 dcircuits.update = function(pos, node)
   if not node.name:find("dcircuits_")  then
-    minetest.chat_send_all("DCircuit: circuit broken!")
+    minetest.chat_send_all("DCircuit: circuit broken at"..minetest.serialize(pos))
     return
   end
   if node.name:find("dcircuits_dis") then
@@ -346,7 +365,17 @@ end
 dcircuits.after_dig_node = function(pos, node, metadata, player)
   local ddef = minetest.registered_nodes[node.name].dcircuits
   local meta = minetest.get_meta(pos)
-  meta:from_table(metadata)
+  if metadata then
+    meta:from_table(metadata)
+    for i = 1, 4 do
+      if ddef.parents[i] then
+        local p_pos = minetest.deserialize(meta:get_string("dc_p_"..(i - 1).."_pos"))
+        local p_dir = meta:get_int("dc_p_"..(i - 1).."_dir")
+        dcircuits.remove_child(meta, p_dir)
+      end
+    end
+  end
+  
   dcircuits.disable_children(pos, ddef, meta)
   meta:from_table(nil)
 end
@@ -357,7 +386,28 @@ end
 
 if dcircuits.config.disable_on_dig_connection then
   dcircuits.after_dig_connection = function(pos, node, metadata, player)
-    local parent = dcircuits.follow(pos, node.param2)
+    
+    local facedir = node.param2
+    local q local p 
+    q, p = node.name:find("dcircuits_conI")
+    if p then
+      local d = node.name:sub(p + 1, p + 6)
+      if d == "cross_" then
+        local parent = dcircuits.follow(pos, facedir)
+        if parent.error then
+          return
+        end
+        local ddef = minetest.registered_nodes[parent.node.name].dcircuits
+        local meta = minetest.get_meta(parent.pos)
+        dcircuits.disable_children(pos, ddef, meta)
+        facedir = (facedir + 3) % 4
+      elseif d == "arw_d_" or d == "bot_o_"then
+        facedir = 4
+      elseif d == "arw_u_" or d == "bot_i_"then
+        facedir = 5
+      end
+    end
+    local parent = dcircuits.follow(pos, facedir)
     if parent.error then
       return
     end
