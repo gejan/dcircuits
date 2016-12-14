@@ -26,6 +26,7 @@ minetest.register_node("dcircuits:dcircuits_trg_to_mese_on",{
       end
     end,
   },
+  after_dig_node = dcircuits.after_dig_node,
   drop = "dcircuits:dcircuits_dis_trg_to_mese_off",
 })
 
@@ -54,6 +55,7 @@ minetest.register_node("dcircuits:dcircuits_trg_to_mese_off",{
     end,
   },
   mesecons = {receptor = {state = mesecon.state.off, rules = mesecon.rules.default,}},
+  after_dig_node = dcircuits.after_dig_node,
   drop = "dcircuits:dcircuits_dis_trg_to_mese_off",
 })
 
@@ -75,6 +77,7 @@ minetest.register_node("dcircuits:dcircuits_dis_trg_to_mese_off",{
     parents = {"boolean"},
     children = {},
   },
+  after_dig_node = dcircuits.after_dig_node,
   mesecons = {receptor = {state = mesecon.state.off, rules = mesecon.rules.default,}},
 })
 
@@ -107,6 +110,7 @@ minetest.register_node("dcircuits:dcircuits_src_mese_to_on",{
       return {true, true, true, true}
     end,
   },
+  after_dig_node = dcircuits.after_dig_node,
   drop = "dcircuits:dcircuits_src_mese_to_off",
 })
 
@@ -137,6 +141,7 @@ minetest.register_node("dcircuits:dcircuits_src_mese_to_off",{
       return {false, false, false, false}
     end,
   },
+  after_dig_node = dcircuits.after_dig_node,
 })
 
 

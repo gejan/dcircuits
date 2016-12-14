@@ -11,7 +11,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_con_1",
+  output = "dcircuits:dcircuits_con_1 3",
   recipe = {
     {"dcircuits:dcircuits_con_0", "", ""},
     {"dcircuits:dcircuits_con_0", "dcircuits:dcircuits_con_0", ""},
@@ -20,7 +20,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_con_2",
+  output = "dcircuits:dcircuits_con_2 3",
   recipe = {
     {"dcircuits:dcircuits_con_0", "", ""},
     {"dcircuits:dcircuits_con_0", "", ""},
@@ -29,7 +29,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_con_3",
+  output = "dcircuits:dcircuits_con_3 3",
   recipe = {
     {"",                          "dcircuits:dcircuits_con_0", ""},
     {"dcircuits:dcircuits_con_0", "dcircuits:dcircuits_con_0", ""},
@@ -38,7 +38,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_conIcross_x",
+  output = "dcircuits:dcircuits_conIcross_x 5",
   recipe = {
     {"dcircuits:dcircuits_con_0", "", "dcircuits:dcircuits_con_0"},
     {"",                    "dcircuits:dcircuits_con_0", ""},
@@ -47,7 +47,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_conIarw_u_up",
+  output = "dcircuits:dcircuits_conIarw_u_up 3",
   recipe = {
     {"", "", ""},
     {"",                    "dcircuits:dcircuits_con_0", ""},
@@ -56,7 +56,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_conIarw_d_down",
+  output = "dcircuits:dcircuits_conIarw_d_down 3",
   recipe = {
     {"dcircuits:dcircuits_con_0", "", "dcircuits:dcircuits_con_0"},
     {"",                    "dcircuits:dcircuits_con_0", ""},
@@ -78,7 +78,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_att_num",
+  output = "dcircuits:dcircuits_att_num 3",
   recipe = {
     {"dcircuits:dcircuits_con_0", "dcircuits:dcircuits_con_0", "dcircuits:dcircuits_con_0"},
     {"dcircuits:dcircuits_con_0", "dcircuits:dcircuits_con_0", "dcircuits:dcircuits_con_0"},
@@ -97,7 +97,7 @@ minetest.register_craft({
 --////////////////////////////
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_dis_nod_bool",
+  output = "dcircuits:dcircuits_dis_nod_bool 5",
   recipe = {
     {"",                          "dcircuits:dcircuits_con_0", ""},
     {"dcircuits:dcircuits_con_0", "dcircuits:dcircuits_con_0", "dcircuits:dcircuits_con_0"},
@@ -122,7 +122,7 @@ minetest.register_craft({
 --////////////////////////////
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_dis_gat_and",
+  output = "dcircuits:dcircuits_dis_gat_and 2",
   recipe = {
     {"", "", ""},
     {"dcircuits:dcircuits_con_0", "default:mese_crystal_fragment", "dcircuits:dcircuits_con_0"},
@@ -143,7 +143,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_dis_gat_cond_bool",
+  output = "dcircuits:dcircuits_dis_gat_cond_bool 2",
   recipe = {
     {"dcircuits:dcircuits_dis_gat_and", "dcircuits:dcircuits_dis_gat_or", ""},
     {"", "", ""},
@@ -164,7 +164,7 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
-  output = "dcircuits:dcircuits_dis_gat_add",
+  output = "dcircuits:dcircuits_dis_gat_add 2",
   recipe = {
     {"dcircuits:dcircuits_dis_gat_and", "dcircuits:dcircuits_dis_gat_xor", ""},
     {"", "", ""},
@@ -349,8 +349,4 @@ minetest.register_craft({
   output = "dcircuits:dcircuits_reg_str",
   recipe = {"dcircuits:dcircuits_reg_bool", "dcircuits:dcircuits_att_str"}
 })
-
-
-
-
 

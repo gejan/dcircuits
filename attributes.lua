@@ -12,6 +12,7 @@ minetest.register_node("dcircuits:dcircuits_att_not", {
   walkable = true,
   groups = {snappy = 1, oddly_breakable_by_hand = 1},
   after_dig_node = dcircuits.after_dig_connection,
+  after_place_node = dcircuits.on_place_connect,
 })
 
 minetest.register_node("dcircuits:dcircuits_att_num", {
@@ -28,6 +29,7 @@ minetest.register_node("dcircuits:dcircuits_att_num", {
   walkable = true,
   groups = {snappy = 1, oddly_breakable_by_hand = 1},
   after_dig_node = dcircuits.after_dig_connection,
+  after_place_node = dcircuits.on_place_connect,
 })
 
 minetest.register_node("dcircuits:dcircuits_att_str", {
@@ -44,4 +46,5 @@ minetest.register_node("dcircuits:dcircuits_att_str", {
   walkable = true,
   groups = {snappy = 1, oddly_breakable_by_hand = 1},
   after_dig_node = dcircuits.after_dig_connection,
+  after_place_node = dcircuits.on_place_connect,
 })

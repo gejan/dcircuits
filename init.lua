@@ -2,10 +2,10 @@ dcircuits = {}
 
 dcircuits.config = {}
 
-dcircuits.config.cycle_checking = false               -- not really impl
-dcircuits.config.replace_connections = false          -- not impl
-dcircuits.config.disable_on_dig_connection = true
-dcircuits.config.type_attribute_mode = "direct"     -- "no_check" | "check" | "direct" | "strong"
+dcircuits.config.cycle_checking = false               -- experimental
+dcircuits.config.replace_connections = "specialize"     -- "none" | "specialize" | "dissolve" -- experimental
+dcircuits.config.disable_on_dig_connection = true     -- has no impact if replace_connections = "dissolve" 
+dcircuits.config.type_attribute_mode = "direct"       -- "no_check" | "check" | "direct" | "strong"
 
 local path = minetest.get_modpath("dcircuits")
 dofile(path.."/common.lua")

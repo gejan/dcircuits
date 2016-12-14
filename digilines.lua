@@ -36,6 +36,7 @@ minetest.register_node("dcircuits:dcircuits_trg_to_digiline",{
       minetest.get_meta(pos):set_string("channel", fields.channel) 
     end 
   end,
+  after_dig_node = dcircuits.after_dig_node,
   drop = "dcircuits:dcircuits_dis_trg_to_digiline",
 })
 
@@ -60,7 +61,8 @@ minetest.register_node("dcircuits:dcircuits_dis_trg_to_digiline",{
   on_construct = function(pos)
     local meta = minetest.get_meta(pos)
     meta:set_string("formspec", "field[channel;Channel;${channel}]")
-  end
+  end,
+  after_dig_node = dcircuits.after_dig_node,
 })
 
 minetest.register_node("dcircuits:dcircuits_src_digiline_to",{
@@ -109,6 +111,7 @@ minetest.register_node("dcircuits:dcircuits_src_digiline_to",{
       minetest.get_meta(pos):set_string("channel", fields.channel) 
     end 
   end, 
+  after_dig_node = dcircuits.after_dig_node,
 })
 
 

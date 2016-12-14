@@ -17,6 +17,7 @@ minetest.register_node("dcircuits:dcircuits_nod_bool", {
       return {nil, inputs[1], inputs[1], inputs[1]}
     end,
   },
+  after_dig_node = dcircuits.after_dig_node,
   drop = "dcircuits:dcircuits_dis_nod_bool",
 })
 
@@ -58,6 +59,7 @@ minetest.register_node("dcircuits:dcircuits_nod_int", {
       return {nil, inputs[1], inputs[1], inputs[1]}
     end,
   },
+  after_dig_node = dcircuits.after_dig_node,
   drop = "dcircuits:dcircuits_dis_nod_int",
 })
 
@@ -100,6 +102,7 @@ minetest.register_node("dcircuits:dcircuits_nod_str", {
       return {nil, inputs[1], inputs[1], inputs[1]}
     end,
   },
+  after_dig_node = dcircuits.after_dig_node,
   drop = "dcircuits:dcircuits_dis_nod_str",
 })
 

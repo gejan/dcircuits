@@ -1,4 +1,3 @@
-
 dcircuits.visited = {}
 
 local begin_visit = function()
@@ -160,6 +159,37 @@ dcircuits.remove_child = function(meta, dir)
   meta:set_string("dc_c_"..dir.."_att", nil)
 end
 
+local replace_visited = function(type)
+  return
+end
+
+if dcircuits.config.replace_connections == "specialize" then
+  replace_visited = function(type)
+    for _, pos in ipairs(dcircuits.visited) do
+      local node = minetest.get_node(pos)
+      local e
+      _, e = node.name:find("dcircuits_con_")
+      if e then
+        local i = node.name:sub(e+1)
+        if i == "1" or i == "2" or i == "3" then
+          node.name = node.name.."_"..type
+          minetest.swap_node(pos, node) 
+        end
+      end
+    end
+  end
+end
+
+if dcircuits.config.replace_connections == "dissolve" then
+  replace_visited = function(type)
+    for _, pos in ipairs(dcircuits.visited) do
+      local node = minetest.get_node(pos)
+      node.name = "air"
+      minetest.swap_node(pos, node) 
+    end
+  end
+end
+
 
 local attribute_match 
 
@@ -213,6 +243,7 @@ dcircuits.connect = function(pos, node, player)
       if  ddef.parents[i] == parent_def.children[parent.dir + 1] then
         if attribute_match(ddef.parents[i], parent.attribute, parent.imm) then
           dcircuits.add_parent(pos, dir, parent.pos, parent.dir)
+          replace_visited(ddef.parents[i])
           table.insert(parent_list, parent)
           if parent.attribute == "not" then
             dcircuits.add_child(parent.pos, parent.dir, pos, dir, "not")
@@ -351,14 +382,18 @@ dcircuits.disable = function(pos, node)
   end
 end
 
+dcircuits.disable_child = function(pos, node_def, meta, dir)
+  if node_def.children[dir + 1] then
+    local child_pos = minetest.deserialize(meta:get_string("dc_c_"..dir.."_pos"))
+    if child_pos then
+      dcircuits.disable(child_pos, minetest.get_node(child_pos))
+    end
+  end
+end
+
 dcircuits.disable_children = function(pos, node_def, meta)
   for i = 1, 4 do
-    if node_def.children[i] then
-      local child_pos = minetest.deserialize(meta:get_string("dc_c_"..(i - 1).."_pos"))
-      if child_pos then
-        dcircuits.disable(child_pos, minetest.get_node(child_pos))
-      end
-    end
+    dcircuits.disable_child(pos, node_def, meta, i - 1)
   end
 end
 
@@ -388,8 +423,8 @@ if dcircuits.config.disable_on_dig_connection then
   dcircuits.after_dig_connection = function(pos, node, metadata, player)
     
     local facedir = node.param2
-    local q local p 
-    q, p = node.name:find("dcircuits_conI")
+    local p 
+    _, p = node.name:find("dcircuits_conI")
     if p then
       local d = node.name:sub(p + 1, p + 6)
       if d == "cross_" then
@@ -399,7 +434,7 @@ if dcircuits.config.disable_on_dig_connection then
         end
         local ddef = minetest.registered_nodes[parent.node.name].dcircuits
         local meta = minetest.get_meta(parent.pos)
-        dcircuits.disable_children(pos, ddef, meta)
+        dcircuits.disable_child(pos, ddef, meta, parent.dir)
         facedir = (facedir + 3) % 4
       elseif d == "arw_d_" or d == "bot_o_"then
         facedir = 4
@@ -413,7 +448,7 @@ if dcircuits.config.disable_on_dig_connection then
     end
     local ddef = minetest.registered_nodes[parent.node.name].dcircuits
     local meta = minetest.get_meta(parent.pos)
-    dcircuits.disable_children(pos, ddef, meta)
+    dcircuits.disable_child(pos, ddef, meta, parent.dir)
   end
 end
 

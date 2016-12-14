@@ -1,4 +1,4 @@
-local on_place_connect = function(pos, player, itemstack, pointed_thing)
+dcircuits.on_place_connect = function(pos, player, itemstack, pointed_thing)
   local p
   local n
   local i = 0
@@ -22,70 +22,111 @@ local on_place_connect = function(pos, player, itemstack, pointed_thing)
   end
 end
 
-minetest.register_node("dcircuits:dcircuits_con_0",{
-  description = "Wire",
-  inventory_image = "dcircuits_con_0.png",
-  tiles = {"dcircuits_con_0.png"},
-  drawtype = "nodebox",
-  node_box = {
-    type = "fixed",
-    fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
-  },
-  paramtype = "light",
-  paramtype2 = "facedir",
-  walkable = true,
-  groups = {snappy = 1, oddly_breakable_by_hand = 1},   -- wire
-  after_dig_node = dcircuits.after_dig_connection,
-  after_place_node = on_place_connect,
-})
+local function register_wire(i)
+  if dcircuits.config.replace_connections == "specialize" then 
+    minetest.register_node("dcircuits:dcircuits_con_"..i,{
+      description = "Wire",
+      inventory_image = "dcircuits_con_"..i..".png",
+      tiles = {"dcircuits_con_"..i..".png"},
+      drawtype = "nodebox",
+      node_box = {
+        type = "fixed",
+        fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
+      },
+      paramtype = "light",
+      paramtype2 = "facedir",
+      walkable = true,
+      groups = {snappy = 1, oddly_breakable_by_hand = 1},   -- wire
+      after_place_node = dcircuits.on_place_connect,
+    })
+    if tonumber(i) > 0 then
+      minetest.register_node("dcircuits:dcircuits_con_"..i.."_boolean",{
+        description = "Wire",
+        tiles = {"dcircuits_con_"..i.."_bool.png"},
+        drawtype = "nodebox",
+        node_box = {
+          type = "fixed",
+          fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
+        },
+        paramtype = "light",
+        paramtype2 = "facedir",
+        walkable = true,
+        groups = {not_in_creative_inventory = 1, snappy = 1, oddly_breakable_by_hand = 1},   -- wire
+        after_dig_node = dcircuits.after_dig_connection,
+        drop = "dcircuits:dcircuits_con_"..i,
+      })
+      minetest.register_node("dcircuits:dcircuits_con_"..i.."_integer",{
+        description = "Wire",
+        tiles = {"dcircuits_con_"..i.."_int.png"},
+        drawtype = "nodebox",
+        node_box = {
+          type = "fixed",
+          fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
+        },
+        paramtype = "light",
+        paramtype2 = "facedir",
+        walkable = true,
+        groups = {not_in_creative_inventory = 1, snappy = 1, oddly_breakable_by_hand = 1},   -- wire
+        after_dig_node = dcircuits.after_dig_connection,
+        drop = "dcircuits:dcircuits_con_"..i,
+      })
+      minetest.register_node("dcircuits:dcircuits_con_"..i.."_string",{
+        description = "Wire",
+        tiles = {"dcircuits_con_"..i.."_str.png"},
+        drawtype = "nodebox",
+        node_box = {
+          type = "fixed",
+          fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
+        },
+        paramtype = "light",
+        paramtype2 = "facedir",
+        walkable = true,
+        groups = {not_in_creative_inventory = 1, snappy = 1, oddly_breakable_by_hand = 1},   -- wire
+        after_dig_node = dcircuits.after_dig_connection,
+        drop = "dcircuits:dcircuits_con_"..i,
+      })
+    end
+  elseif dcircuits.config.replace_connections == "dissolve" then
+    minetest.register_node("dcircuits:dcircuits_con_"..i,{
+      description = "Wire",
+      inventory_image = "dcircuits_con_"..i..".png",
+      tiles = {"dcircuits_con_"..i..".png"},
+      drawtype = "nodebox",
+      node_box = {
+        type = "fixed",
+        fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
+      },
+      paramtype = "light",
+      paramtype2 = "facedir",
+      walkable = true,
+      groups = {snappy = 1, oddly_breakable_by_hand = 1},   -- wire
+      after_place_node = dcircuits.on_place_connect,
+    })
+  else
+    minetest.register_node("dcircuits:dcircuits_con_"..i,{
+      description = "Wire",
+      inventory_image = "dcircuits_con_"..i..".png",
+      tiles = {"dcircuits_con_"..i..".png"},
+      drawtype = "nodebox",
+      node_box = {
+        type = "fixed",
+        fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
+      },
+      paramtype = "light",
+      paramtype2 = "facedir",
+      walkable = true,
+      groups = {snappy = 1, oddly_breakable_by_hand = 1},   -- wire
+      after_place_node = dcircuits.on_place_connect,
+      after_dig_node = dcircuits.after_dig_connection,
+    })
+  end
+end
 
-minetest.register_node("dcircuits:dcircuits_con_1",{
-  description = "Wire",
-  inventory_image = "dcircuits_con_1.png",
-  tiles = {"dcircuits_con_1.png"},
-  drawtype = "nodebox",
-  node_box = {
-    type = "fixed",
-    fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
-  },
-  paramtype = "light",
-  paramtype2 = "facedir",
-  walkable = true,
-  groups = {snappy = 1, oddly_breakable_by_hand = 1},   -- wire
-  after_dig_node = dcircuits.after_dig_connection,
-})
+register_wire("0")
+register_wire("1")
+register_wire("2")
+register_wire("3")
 
-minetest.register_node("dcircuits:dcircuits_con_2",{
-  description = "Wire",
-  inventory_image = "dcircuits_con_2.png",
-  tiles = {"dcircuits_con_2.png"},
-  drawtype = "nodebox",
-  node_box = {
-    type = "fixed",
-    fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
-  },
-  paramtype = "light",
-  paramtype2 = "facedir",
-  walkable = true,
-  groups = {snappy = 1, oddly_breakable_by_hand = 1},   -- wire
-  after_dig_node = dcircuits.after_dig_connection,
-})
-
-minetest.register_node("dcircuits:dcircuits_con_3",{
-  description = "Wire",
-  inventory_image = "dcircuits_con_3.png",
-  tiles = {"dcircuits_con_3.png"},
-  drawtype = "nodebox",
-  node_box = {
-    type = "fixed",
-    fixed = {{-0.5, -0.5, -0.5, 0.5, -0.4375 , 0.5}}
-  },
-  paramtype = "light",
-  paramtype2 = "facedir",
-  walkable = true,
-  groups = {snappy = 1, oddly_breakable_by_hand = 1},   -- wire
-  after_dig_node = dcircuits.after_dig_connection,
-})
 
 minetest.register_node("dcircuits:dcircuits_conIcross_x",{
   description = "Wire",
@@ -216,6 +257,4 @@ minetest.register_node("dcircuits:dcircuits_conIbot_i_to_above",{
   groups = {snappy = 1, oddly_breakable_by_hand = 1},   -- wire
   after_dig_node = dcircuits.after_dig_connection,
 })
-
-
 
